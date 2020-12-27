@@ -28,6 +28,7 @@ namespace Meta {
         // Member data
         std::vector<MetaBall> m_MetaBalls;
         std::vector<uint8_t>  m_Pixels;
+        sf::Image             m_Image;
         sf::Texture           m_Texture;
         sf::Sprite            m_Sprite;
 

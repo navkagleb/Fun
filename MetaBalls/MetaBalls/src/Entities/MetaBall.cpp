@@ -12,12 +12,12 @@ namespace Meta {
         m_Circle.setFillColor(sf::Color::Green);
 
         // Init velocity
-        m_Velocity = { Ng::Random::Get(0.5f, 10.0f), Ng::Random::Get(0.5f, 10.0f) };
+        m_Velocity = { Ng::Random::Get(100.0f, 300.0f), Ng::Random::Get(100.0f, 300.0f) };
     }
 
     // Public methods
     void MetaBall::OnUpdate(float dt) {
-        m_Circle.setPosition(m_Circle.getPosition() + m_Velocity);
+        m_Circle.setPosition(m_Circle.getPosition() + m_Velocity * dt);
 
         if (m_Circle.getPosition().x < 0.0f || m_Circle.getPosition().x > 1080.0f)
             m_Velocity.x *= -1.0f;
