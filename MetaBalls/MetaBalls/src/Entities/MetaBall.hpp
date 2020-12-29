@@ -13,9 +13,11 @@ namespace Meta {
         virtual ~MetaBall() noexcept = default;
 
         // Accessors
-        const sf::Vector2f& GetPosition() const { return m_Circle.getPosition(); }
+        float GetRadius() const { return m_Circle.getRadius(); }
 
         // Public methods
+        float GetDistance(float x, float y) const;
+
         void OnUpdate(float dt);
         void OnRender(sf::RenderTarget& target) const;
 

@@ -1,25 +1,30 @@
 #include "MetaBallState.hpp"
 
-#include <cmath>
 #include <iostream>
+
+#include <imgui.h>
 
 #include <Random/Random.hpp>
 
 namespace Meta {
 
     // Constructor / Destructor
-    MetaBallState::MetaBallState() {
+    MetaBallState::MetaBallState() :
+        m_Scale(150.0f),
+        m_IsColored(false),
+        m_IsImGui(false) {
+
+        // Init MetaBalls
         m_MetaBalls.reserve(Ng::Random::Get(4, 6));
 
         for (std::size_t i = 0; i < m_MetaBalls.capacity(); ++i)
-            m_MetaBalls.emplace_back(
-                Ng::Random::Get(0.0f, 1080.0f),
-                Ng::Random::Get(0.0f, 720.0f),
-                50.0f
-            );
+            PushMetaBall();
 
-        m_Pixels.resize(1080 * 720);
-        m_Image.create(1080, 720);
+        // Init SFML
+        m_Image.create(
+            Ng::Engine::State::GetContext().GetRenderWindow()->getSize().x,
+            Ng::Engine::State::GetContext().GetRenderWindow()->getSize().y
+        );
         m_Texture.loadFromImage(m_Image);
     }
 
@@ -28,46 +33,119 @@ namespace Meta {
     }
 
     // Public methods
+    void MetaBallState::OnKeyPressed(const sf::Event& event) {
+        if (event.key.code == sf::Keyboard::Escape)
+            m_IsImGui = !m_IsImGui;
+    }
+
     void MetaBallState::OnUpdate(float dt) {
         for (auto& metaBall : m_MetaBalls)
             metaBall.OnUpdate(dt);
 
-        for (std::size_t i = 0; i < 1080; ++i) {
-            for (std::size_t j = 0; j < 720; ++j) {
-                float sum = 0.0f;
+        for (std::size_t x = 0; x < Ng::Engine::State::GetContext().GetRenderWindow()->getSize().x; ++x) {
+            for (std::size_t y = 0; y < Ng::Engine::State::GetContext().GetRenderWindow()->getSize().y; ++y) {
+                int factor = std::accumulate(
+                    m_MetaBalls.begin(),
+                    m_MetaBalls.end(),
+                    0.0f,
+                    [&](float init, const MetaBall& ball) {
+                        return init + ball.GetRadius() * m_Scale / ball.GetDistance(x, y);
+                    }
+                );
 
-                for (const auto& metaBall : m_MetaBalls) {
-                    const auto& position = metaBall.GetPosition();
-
-                    float dist = std::sqrt(
-                        (i - position.x) * (i - position.x) + (j - position.y) * (j - position.y)
-                    );
-
-                    sum += 50.f * 150.f / dist;
-                }
-
-//                if (sum > 255)
-//                    std::cout << "fuck" << std::endl;
-
-//                std::cout << sum << std::endl;
-
-                m_Image.setPixel(i, j, sf::Color(
-                    std::max(0, std::min(static_cast<int>(sum), 240)),
-                    std::max(0, std::min(static_cast<int>(sum), 240)),
-                    std::max(0, std::min(static_cast<int>(sum), 240))
-                ));
+                m_Image.setPixel(x, y, GetColor(factor));
             }
         }
 
         m_Texture.update(m_Image);
         m_Sprite.setTexture(m_Texture);
+
+        // ImGui
+        if (m_IsImGui) {
+            ImGui::Begin("Settings");
+
+            if (ImGui::Button("Push MetaBall"))
+                PushMetaBall();
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Pop MetaBall"))
+                PopMetaBall();
+
+            ImGui::Checkbox("IsColored", &m_IsColored);
+
+            ImGui::End();
+        }
     }
 
     void MetaBallState::OnRender(sf::RenderTarget& target) const {
-        for (auto& metaBall : m_MetaBalls)
-            metaBall.OnRender(target);
-
         target.draw(m_Sprite);
+
+//        for (auto& ball : m_MetaBalls)
+//            ball.OnRender(target);
+    }
+
+    // Member static methods
+    sf::Color MetaBallState::GetRGBFromHSV(int hue, float saturation, float value) {
+        hue %= 360;
+        
+        while (hue < 0) 
+            hue += 360;
+
+        saturation = std::min(1.0f, std::max(0.f, saturation));
+        value      = std::min(1.0f, std::max(0.f, value));
+
+        float f    = static_cast<float>(hue) / 60.0f - static_cast<float>(hue / 60);
+        float p    = value * (1.0f - saturation);
+        float q    = value * (1.0f - saturation * f);
+        float t    = value * (1.0f - saturation * (1.0f - f));
+
+        switch (hue / 60) {
+            default:
+            case 0:
+                return sf::Color::Transparent;
+
+            case 1:
+                return sf::Color(q * 255, value * 255, p * 255);
+
+            case 2:
+                return sf::Color(p * 255, value * 255, t * 255);
+
+            case 3:
+                return sf::Color(p * 255, q * 255, value * 255);
+
+            case 4:
+                return sf::Color(t * 255, p * 255, value * 255);
+
+            case 5:
+                return sf::Color(value * 255, p * 255, q * 255);
+
+            case 6:
+                return sf::Color(value * 255, t * 255, p * 255);
+        }
+    }
+
+    // Member methods
+    void MetaBallState::PushMetaBall() {
+        m_MetaBalls.emplace_back(
+            Ng::Random::Get(0.0f, 1080.0f),
+            Ng::Random::Get(0.0f, 720.0f),
+            Ng::Random::Get(40.0f, 80.0f)
+        );
+    }
+
+    void MetaBallState::PopMetaBall() {
+        if (!m_MetaBalls.empty())
+            m_MetaBalls.pop_back();
+    }
+
+    sf::Color MetaBallState::GetColor(int factor) const {
+        if (!m_IsColored) {
+            factor = std::max(0, std::min(factor, 240));
+            return sf::Color(factor, factor, factor);
+        }
+
+        return GetRGBFromHSV(std::max(0, std::min(factor, 359)), 1.0f, 1.0f);
     }
 
 } // namespace Meta

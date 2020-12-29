@@ -8,7 +8,7 @@ namespace Meta {
     public:
         // Constructor / Destructor
         Application(const Application& other) = delete;
-        ~Application() override = default;
+        ~Application() override;
 
         // Public static methods
         static Application& GetInstance();
@@ -21,6 +21,7 @@ namespace Meta {
         Application();
 
         // Member methods
+        void OnPollEvent() override;
         void OnUpdate() override;
         void OnRender() override;
 
