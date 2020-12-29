@@ -41,6 +41,7 @@ namespace Meta {
         float                 m_Scale;
         bool                  m_IsColored;
         bool                  m_IsImGui;
+        bool                  m_IsMetaBallOutline;
 
     }; // class MetaBallState
 

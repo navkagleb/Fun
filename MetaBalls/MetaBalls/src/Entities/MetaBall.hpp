@@ -9,7 +9,7 @@ namespace Meta {
     class MetaBall {
     public:
         // Constructor / Destructor
-        MetaBall(float x, float y, float radius);
+        MetaBall(float x, float y, float radius, const sf::Vector2f& velocity);
         virtual ~MetaBall() noexcept = default;
 
         // Accessors

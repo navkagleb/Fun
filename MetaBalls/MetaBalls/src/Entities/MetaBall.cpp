@@ -7,20 +7,15 @@
 namespace Meta {
 
     // Constructor / Destructor
-    MetaBall::MetaBall(float x, float y, float radius) {
-        // Init circle
+    MetaBall::MetaBall(float x, float y, float radius, const sf::Vector2f& velocity) :
+        m_Velocity(velocity) {
+
         m_Circle.setPosition(x, y);
         m_Circle.setRadius(radius);
         m_Circle.setFillColor(sf::Color::Transparent);
-        m_Circle.setOutlineThickness(2.0f);
+        m_Circle.setOutlineThickness(3.0f);
         m_Circle.setOutlineColor(sf::Color::Black);
         m_Circle.setOrigin(radius, radius);
-
-        // Init velocity
-        m_Velocity = {
-            Ng::Random::Get(50.0f, 100.0f) * (Ng::Random::Get<bool>(0.5f) ? -1.0f : 1.0f),
-            Ng::Random::Get(50.0f, 100.0f) * (Ng::Random::Get<bool>(0.5f) ? -1.0f : 1.0f)
-        };
     }
 
     // Public methods

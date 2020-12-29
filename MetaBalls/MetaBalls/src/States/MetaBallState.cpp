@@ -12,7 +12,8 @@ namespace Meta {
     MetaBallState::MetaBallState() :
         m_Scale(150.0f),
         m_IsColored(false),
-        m_IsImGui(false) {
+        m_IsImGui(false),
+        m_IsMetaBallOutline(false) {
 
         // Init MetaBalls
         m_MetaBalls.reserve(Ng::Random::Get(4, 6));
@@ -73,6 +74,10 @@ namespace Meta {
                 PopMetaBall();
 
             ImGui::Checkbox("IsColored", &m_IsColored);
+            ImGui::SameLine();
+            ImGui::Checkbox("IsMetaBallOutline", &m_IsMetaBallOutline);
+
+            ImGui::SliderFloat("Scale", &m_Scale, 10.0f, 300.0f);
 
             ImGui::End();
         }
@@ -81,8 +86,9 @@ namespace Meta {
     void MetaBallState::OnRender(sf::RenderTarget& target) const {
         target.draw(m_Sprite);
 
-//        for (auto& ball : m_MetaBalls)
-//            ball.OnRender(target);
+        if (m_IsMetaBallOutline)
+            for (auto& ball : m_MetaBalls)
+                ball.OnRender(target);
     }
 
     // Member static methods
@@ -95,7 +101,7 @@ namespace Meta {
         saturation = std::min(1.0f, std::max(0.f, saturation));
         value      = std::min(1.0f, std::max(0.f, value));
 
-        float f    = static_cast<float>(hue) / 60.0f - static_cast<float>(hue / 60);
+        float f    = static_cast<float>(hue) / 60.0f - std::floor(static_cast<float>(hue) / 60.0f);
         float p    = value * (1.0f - saturation);
         float q    = value * (1.0f - saturation * f);
         float t    = value * (1.0f - saturation * (1.0f - f));
@@ -130,7 +136,11 @@ namespace Meta {
         m_MetaBalls.emplace_back(
             Ng::Random::Get(0.0f, 1080.0f),
             Ng::Random::Get(0.0f, 720.0f),
-            Ng::Random::Get(40.0f, 80.0f)
+            Ng::Random::Get(20.0f, 100.0f),
+            sf::Vector2f(
+                Ng::Random::Get(50.0f, 100.0f) * (Ng::Random::Get<bool>(0.5f) ? -1.0f : 1.0f),
+                Ng::Random::Get(50.0f, 100.0f) * (Ng::Random::Get<bool>(0.5f) ? -1.0f : 1.0f)
+            )
         );
     }
 
