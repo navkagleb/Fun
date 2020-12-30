@@ -16,7 +16,7 @@ namespace Meta {
     public:
         // Constructor / Destructor
         MetaBallState();
-        ~MetaBallState() override;
+        ~MetaBallState() override = default;
 
         // Public methods
         void OnKeyPressed(const sf::Event& event) override;
@@ -31,6 +31,7 @@ namespace Meta {
         // Member methods
         void PushMetaBall();
         void PopMetaBall();
+
         sf::Color GetColor(int factor) const;
 
         // Member data

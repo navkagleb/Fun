@@ -8,7 +8,7 @@
 
 namespace Meta {
 
-    // Constructor / Destructor
+    // Constructor
     MetaBallState::MetaBallState() :
         m_Scale(150.0f),
         m_IsColored(false),
@@ -29,10 +29,6 @@ namespace Meta {
         m_Texture.loadFromImage(m_Image);
     }
 
-    MetaBallState::~MetaBallState() {
-
-    }
-
     // Public methods
     void MetaBallState::OnKeyPressed(const sf::Event& event) {
         if (event.key.code == sf::Keyboard::Escape)
@@ -41,7 +37,7 @@ namespace Meta {
 
     void MetaBallState::OnUpdate(float dt) {
         for (auto& metaBall : m_MetaBalls)
-            metaBall.OnUpdate(dt);
+            metaBall.OnUpdate(dt, Ng::Engine::State::GetContext().GetRenderWindow()->getSize());
 
         for (std::size_t x = 0; x < Ng::Engine::State::GetContext().GetRenderWindow()->getSize().x; ++x) {
             for (std::size_t y = 0; y < Ng::Engine::State::GetContext().GetRenderWindow()->getSize().y; ++y) {
@@ -77,7 +73,7 @@ namespace Meta {
             ImGui::SameLine();
             ImGui::Checkbox("IsMetaBallOutline", &m_IsMetaBallOutline);
 
-            ImGui::SliderFloat("Scale", &m_Scale, 10.0f, 300.0f);
+            ImGui::SliderFloat("Scale", &m_Scale, 10.0f, 400.0f);
 
             ImGui::End();
         }

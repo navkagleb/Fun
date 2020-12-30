@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-#include <Random/Random.hpp>
-
 namespace Meta {
 
     // Constructor / Destructor
@@ -28,13 +26,13 @@ namespace Meta {
         );
     }
 
-    void MetaBall::OnUpdate(float dt) {
+    void MetaBall::OnUpdate(float dt, const sf::Vector2u& windowSize) {
         m_Circle.setPosition(m_Circle.getPosition() + m_Velocity * dt);
 
-        if (m_Circle.getPosition().x < 0.0f || m_Circle.getPosition().x > 1080.0f)
+        if (m_Circle.getPosition().x < 0.0f || m_Circle.getPosition().x > windowSize.x)
             m_Velocity.x *= -1.0f;
 
-        if (m_Circle.getPosition().y < 0.0f || m_Circle.getPosition().y > 720.0f)
+        if (m_Circle.getPosition().y < 0.0f || m_Circle.getPosition().y > windowSize.y)
             m_Velocity.y *= -1.0f;
     }
 

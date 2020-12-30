@@ -18,7 +18,7 @@ namespace Meta {
         // Public methods
         float GetDistance(float x, float y) const;
 
-        void OnUpdate(float dt);
+        void OnUpdate(float dt, const sf::Vector2u& windowSize);
         void OnRender(sf::RenderTarget& target) const;
 
     private:
