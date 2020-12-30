@@ -27,13 +27,27 @@ namespace Meta {
     }
 
     void MetaBall::OnUpdate(float dt, const sf::Vector2u& windowSize) {
-        m_Circle.setPosition(m_Circle.getPosition() + m_Velocity * dt);
-
-        if (m_Circle.getPosition().x < 0.0f || m_Circle.getPosition().x > windowSize.x)
+        if (m_Circle.getPosition().x <= 0.0f) {
+            m_Circle.setPosition(0.0f, m_Circle.getPosition().y);
             m_Velocity.x *= -1.0f;
+        }
 
-        if (m_Circle.getPosition().y < 0.0f || m_Circle.getPosition().y > windowSize.y)
+        if (m_Circle.getPosition().x >= windowSize.x) {
+            m_Circle.setPosition(windowSize.x, m_Circle.getPosition().y);
+            m_Velocity.x *= -1.0f;
+        }
+
+        if (m_Circle.getPosition().y <= 0.0f) {
+            m_Circle.setPosition(m_Circle.getPosition().x, 0.0f);
             m_Velocity.y *= -1.0f;
+        }
+
+        if (m_Circle.getPosition().y >= windowSize.y) {
+            m_Circle.setPosition(m_Circle.getPosition().x, windowSize.y);
+            m_Velocity.y *= -1.0f;
+        }
+
+        m_Circle.setPosition(m_Circle.getPosition() + m_Velocity * dt);
     }
 
     void MetaBall::OnRender(sf::RenderTarget& target) const {

@@ -27,7 +27,7 @@ namespace Meta {
         ) {
 
         // Init RenderWindow context
-        Ng::Engine::Application::GetContext().SetFramerateLimit(60u);
+        Ng::Engine::Application::GetContext().SetFramerateLimit(120u);
         Ng::Engine::Application::GetContext().SetVerticalSyncEnabled(true);
         Ng::Engine::Application::GetContext().SetKeyRepeatEnabled(false);
 

@@ -1,7 +1,6 @@
 #include "MetaBallState.hpp"
 
 #include <iostream>
-
 #include <imgui.h>
 
 #include <Random/Random.hpp>
@@ -10,6 +9,7 @@ namespace Meta {
 
     // Constructor
     MetaBallState::MetaBallState() :
+        m_ThreadPool(30),
         m_Scale(150.0f),
         m_IsColored(false),
         m_IsImGui(false),
@@ -27,6 +27,7 @@ namespace Meta {
             Ng::Engine::State::GetContext().GetRenderWindow()->getSize().y
         );
         m_Texture.loadFromImage(m_Image);
+        m_Sprite.setTexture(m_Texture);
     }
 
     // Public methods
@@ -39,27 +40,28 @@ namespace Meta {
         for (auto& metaBall : m_MetaBalls)
             metaBall.OnUpdate(dt, Ng::Engine::State::GetContext().GetRenderWindow()->getSize());
 
-        for (std::size_t x = 0; x < Ng::Engine::State::GetContext().GetRenderWindow()->getSize().x; ++x) {
-            for (std::size_t y = 0; y < Ng::Engine::State::GetContext().GetRenderWindow()->getSize().y; ++y) {
-                int factor = std::accumulate(
-                    m_MetaBalls.begin(),
-                    m_MetaBalls.end(),
-                    0.0f,
-                    [&](float init, const MetaBall& ball) {
-                        return init + ball.GetRadius() * m_Scale / ball.GetDistance(x, y);
-                    }
-                );
+        std::size_t offset = m_Image.getSize().x / m_ThreadPool.GetThreadsCount();
+        std::vector<std::future<void>> futures(m_ThreadPool.GetThreadsCount());
 
-                m_Image.setPixel(x, y, GetColor(factor));
-            }
+        for (std::size_t i = 0; i < m_ThreadPool.GetThreadsCount(); ++i) {
+            futures[i] = std::move(
+                m_ThreadPool.Enqueue([this, left = i * offset, right = (i + 1) * offset]() {
+                    OnUpdateImage(left, right);
+                })
+            );
         }
 
+        for (auto& future : futures)
+            future.get();
+
         m_Texture.update(m_Image);
-        m_Sprite.setTexture(m_Texture);
 
         // ImGui
         if (m_IsImGui) {
             ImGui::Begin("Settings");
+
+            ImGui::TextUnformatted(("FPS: " + std::to_string(1.0f / dt)).c_str());
+            ImGui::TextUnformatted(("MetaBall Count: " + std::to_string(m_MetaBalls.size())).c_str());
 
             if (ImGui::Button("Push MetaBall"))
                 PushMetaBall();
@@ -143,6 +145,23 @@ namespace Meta {
     void MetaBallState::PopMetaBall() {
         if (!m_MetaBalls.empty())
             m_MetaBalls.pop_back();
+    }
+
+    void MetaBallState::OnUpdateImage(std::size_t left, std::size_t right) {
+        for (std::size_t x = left; x < right; ++x) {
+            for (std::size_t y = 0; y < m_Image.getSize().y; ++y) {
+                int factor = std::accumulate(
+                    m_MetaBalls.begin(),
+                    m_MetaBalls.end(),
+                    0.0f,
+                    [&](float init, const MetaBall& ball) {
+                        return init + ball.GetRadius() * m_Scale / ball.GetDistance(x, y);
+                    }
+                );
+
+                m_Image.setPixel(x, y, GetColor(factor));
+            }
+        }
     }
 
     sf::Color MetaBallState::GetColor(int factor) const {

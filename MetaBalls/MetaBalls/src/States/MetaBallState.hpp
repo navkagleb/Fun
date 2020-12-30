@@ -9,6 +9,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 
 #include "Entities/MetaBall.hpp"
+#include "ThreadPool/ThreadPool.hpp"
 
 namespace Meta {
 
@@ -32,6 +33,8 @@ namespace Meta {
         void PushMetaBall();
         void PopMetaBall();
 
+        void OnUpdateImage(std::size_t left, std::size_t right);
+
         sf::Color GetColor(int factor) const;
 
         // Member data
@@ -39,6 +42,7 @@ namespace Meta {
         sf::Image             m_Image;
         sf::Texture           m_Texture;
         sf::Sprite            m_Sprite;
+        ThreadPool            m_ThreadPool;
         float                 m_Scale;
         bool                  m_IsColored;
         bool                  m_IsImGui;

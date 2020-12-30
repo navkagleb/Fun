@@ -22,8 +22,6 @@ namespace Meta {
         void OnRender(sf::RenderTarget& target) const;
 
     private:
-        // Member methods
-
         // Member data
         sf::CircleShape m_Circle;
         sf::Vector2f    m_Velocity;
