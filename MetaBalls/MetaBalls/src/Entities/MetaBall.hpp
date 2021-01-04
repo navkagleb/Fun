@@ -15,6 +15,9 @@ namespace Meta {
         // Accessors
         float GetRadius() const { return m_Circle.getRadius(); }
 
+        // Modifiers
+        void SetPosition(float x, float y);
+
         // Public methods
         float GetDistance(float x, float y) const;
 

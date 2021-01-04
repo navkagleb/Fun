@@ -16,6 +16,11 @@ namespace Meta {
         m_Circle.setOrigin(radius, radius);
     }
 
+    // Modifiers
+    void MetaBall::SetPosition(float x, float y) {
+        m_Circle.setPosition(x, y);
+    }
+
     // Public methods
     float MetaBall::GetDistance(float x, float y) const {
         return static_cast<float>(

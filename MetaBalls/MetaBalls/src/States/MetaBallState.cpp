@@ -3,8 +3,6 @@
 #include <iostream>
 #include <imgui.h>
 
-#include <Random/Random.hpp>
-
 namespace Meta {
 
     // Constructor
@@ -13,7 +11,9 @@ namespace Meta {
         m_Scale(150.0f),
         m_IsColored(false),
         m_IsImGui(false),
-        m_IsMetaBallOutline(false) {
+        m_IsMetaBallOutline(false),
+        m_IsPressed(false),
+        m_IsPaused(false) {
 
         // Init MetaBalls
         m_MetaBalls.reserve(Ng::Random::Get(4, 6));
@@ -31,36 +31,71 @@ namespace Meta {
     }
 
     // Public methods
+    void MetaBallState::OnMouseMoved(const sf::Event& event) {
+        if (m_IsPressed) {
+            m_MetaBalls.back().SetPosition(
+                static_cast<float>(event.mouseMove.x),
+                static_cast<float>(event.mouseMove.y)
+            );
+        }
+    }
+
+    void MetaBallState::OnMouseButtonPressed(const sf::Event& event) {
+        if (event.mouseButton.button == sf::Mouse::Left && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
+            PushMetaBall(
+                static_cast<float>(event.mouseButton.x),
+                static_cast<float>(event.mouseButton.y),
+                sf::Vector2f(0.0f, 0.0f)
+            );
+            m_IsPressed = true;
+        }
+    }
+
+    void MetaBallState::OnMouseButtonReleased(const sf::Event& event) {
+        if (event.mouseButton.button == sf::Mouse::Left && !ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
+            PopMetaBall();
+            m_IsPressed = false;
+            std::cout << "Released" << std::endl;
+        }
+    }
+
     void MetaBallState::OnKeyPressed(const sf::Event& event) {
         if (event.key.code == sf::Keyboard::Escape)
             m_IsImGui = !m_IsImGui;
+
+        if (event.key.code == sf::Keyboard::P)
+            m_IsPaused = !m_IsPaused;
     }
 
     void MetaBallState::OnUpdate(float dt) {
-        for (auto& metaBall : m_MetaBalls)
-            metaBall.OnUpdate(dt, Ng::Engine::State::GetContext().GetRenderWindow()->getSize());
+        if (!m_IsPaused) {
+            for (auto& metaBall : m_MetaBalls)
+                metaBall.OnUpdate(dt, Ng::Engine::State::GetContext().GetRenderWindow()->getSize());
 
-        std::size_t offset = m_Image.getSize().x / m_ThreadPool.GetThreadsCount();
-        std::vector<std::future<void>> futures(m_ThreadPool.GetThreadsCount());
+            // Update image
+            std::size_t offset = m_Image.getSize().x / m_ThreadPool.GetThreadsCount();
+            std::vector<std::future<void>> futures(m_ThreadPool.GetThreadsCount());
 
-        for (std::size_t i = 0; i < m_ThreadPool.GetThreadsCount(); ++i) {
-            futures[i] = std::move(
-                m_ThreadPool.Enqueue([this, left = i * offset, right = (i + 1) * offset]() {
-                    OnUpdateImage(left, right);
-                })
-            );
+            for (std::size_t i = 0; i < m_ThreadPool.GetThreadsCount(); ++i) {
+                futures[i] = std::move(
+                    m_ThreadPool.Enqueue([this, left = i * offset, right = (i + 1) * offset]() {
+                        OnUpdateImage(left, right);
+                    })
+                );
+            }
+
+            for (auto& future : futures)
+                future.get();
+
+            m_Texture.update(m_Image);
         }
-
-        for (auto& future : futures)
-            future.get();
-
-        m_Texture.update(m_Image);
 
         // ImGui
         if (m_IsImGui) {
             ImGui::Begin("Settings");
 
             ImGui::TextUnformatted(("FPS: " + std::to_string(1.0f / dt)).c_str());
+            ImGui::Spacing();
             ImGui::TextUnformatted(("MetaBall Count: " + std::to_string(m_MetaBalls.size())).c_str());
 
             if (ImGui::Button("Push MetaBall"))
@@ -70,6 +105,9 @@ namespace Meta {
 
             if (ImGui::Button("Pop MetaBall"))
                 PopMetaBall();
+
+            if (ImGui::Button("Pause"))
+                m_IsPaused = !m_IsPaused;
 
             ImGui::Checkbox("IsColored", &m_IsColored);
             ImGui::SameLine();
@@ -130,16 +168,8 @@ namespace Meta {
     }
 
     // Member methods
-    void MetaBallState::PushMetaBall() {
-        m_MetaBalls.emplace_back(
-            Ng::Random::Get(0.0f, 1080.0f),
-            Ng::Random::Get(0.0f, 720.0f),
-            Ng::Random::Get(20.0f, 100.0f),
-            sf::Vector2f(
-                Ng::Random::Get(50.0f, 100.0f) * (Ng::Random::Get<bool>(0.5f) ? -1.0f : 1.0f),
-                Ng::Random::Get(50.0f, 100.0f) * (Ng::Random::Get<bool>(0.5f) ? -1.0f : 1.0f)
-            )
-        );
+    void MetaBallState::PushMetaBall(float x, float y, const sf::Vector2f& velocity) {
+        m_MetaBalls.emplace_back(x, y, Ng::Random::Get(20.0f, 100.0f), velocity);
     }
 
     void MetaBallState::PopMetaBall() {

@@ -33,6 +33,7 @@ namespace Ng::Engine {
 
         // subsidiaries data
         sf::RenderWindow m_RenderWindow;
+        sf::Image        m_Icon;
         sf::Time         m_ElapsedTime;
         sf::Clock        m_Clock;
 

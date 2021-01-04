@@ -1,5 +1,7 @@
 #include "Application.hpp"
 
+#include <filesystem>
+
 #include <imgui-SFML.h>
 
 #include "States/MetaBallState.hpp"
@@ -26,10 +28,19 @@ namespace Meta {
             sf::ContextSettings(0, 0, 8, 1, 1, sf::ContextSettings::Attribute::Default, false)
         ) {
 
+        // Init icon
+        if (!m_Icon.loadFromFile("../../MetaBalls/media/Images/MainIcon.png"))
+            throw std::invalid_argument("Meta::Application::Application: Failed to load the icon");
+
         // Init RenderWindow context
         Ng::Engine::Application::GetContext().SetFramerateLimit(120u);
         Ng::Engine::Application::GetContext().SetVerticalSyncEnabled(true);
         Ng::Engine::Application::GetContext().SetKeyRepeatEnabled(false);
+        Ng::Engine::Application::GetContext().GetRenderWindow()->setIcon(
+            m_Icon.getSize().x,
+            m_Icon.getSize().y,
+            m_Icon.getPixelsPtr()
+        );
 
         // Init ImGui-SFML
         ImGui::SFML::Init(m_RenderWindow);
