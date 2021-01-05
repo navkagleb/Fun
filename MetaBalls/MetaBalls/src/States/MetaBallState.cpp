@@ -55,7 +55,6 @@ namespace Meta {
         if (event.mouseButton.button == sf::Mouse::Left && !ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow)) {
             PopMetaBall();
             m_IsPressed = false;
-            std::cout << "Released" << std::endl;
         }
     }
 

@@ -29,7 +29,7 @@ namespace Meta {
         ) {
 
         // Init icon
-        if (!m_Icon.loadFromFile("../../MetaBalls/media/Images/MainIcon.png"))
+        if (!m_Icon.loadFromFile("../../MetaBalls/media/Images/Icon.png"))
             throw std::invalid_argument("Meta::Application::Application: Failed to load the icon");
 
         // Init RenderWindow context
