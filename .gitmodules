@@ -1,3 +1,6 @@
 [submodule "MetaBalls/lib/Random"]
 	path = MetaBalls/lib/Random
 	url = https://github.com/NavkaGleb/Random
+[submodule "EventSystem/external/glfw"]
+	path = EventSystem/external/glfw
+	url = https://github.com/glfw/glfw

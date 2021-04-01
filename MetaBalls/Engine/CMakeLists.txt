@@ -14,6 +14,10 @@ set(SOURCE_FILES
     src/States/StateStack.cpp
 )
 
+#if (NOT BUILD_SHARED_LIBS)
+#    set(SFML_STATIC_LIBRARIES ON)
+#endif()
+
 # SFML
 find_package(SFML 2.5.1 COMPONENTS system window graphics audio REQUIRED)
 
@@ -25,6 +29,6 @@ find_package(SFML 2.5.1 COMPONENTS system window graphics audio REQUIRED)
 add_library(Engine ${HEADER_FILES} ${SOURCE_FILES})
 #target_include_directories(Engine PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-target_link_libraries(Engine PUBLIC ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} -lsfml-graphics -lsfml-window -lsfml-system)
+target_link_libraries(Engine PUBLIC ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 
 target_include_directories(Engine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" ${SFML_INCLUDE_DIR})
