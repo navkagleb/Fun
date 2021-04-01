@@ -3,12 +3,15 @@ project(EventSystem)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(HEADER_FILES src/*.hpp)
+file(GLOB HEADER_FILES src/*.hpp)
+file(GLOB SOURCE_FILES src/*.cpp)
 
-set(SOURCE_FILES src/*.cpp)
+include_directories(src)
 
 add_subdirectory(external/glfw)
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
+
+target_precompile_headers(${PROJECT_NAME} PRIVATE src/pch.hpp)

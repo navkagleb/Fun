@@ -1,6 +1,14 @@
 #include <iostream>
 
+#include "Window.hpp"
+
 int main() {
-    std::cout << "Hello, EventSystem!" << std::endl;
+    auto& window = EventSystem::Window::Create("EventSystem", 1280, 720);
+
+    while (window.IsOpen()) {
+        window.PollEvents();
+        window.SwapBuffers();
+    }
+
     return 0;
 }
