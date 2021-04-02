@@ -4,6 +4,7 @@
 #include "Events/KeyEvent.hpp"
 
 #include "System/Input.hpp"
+#include "Events/EventDispatcher.hpp"
 
 int main() {
     auto& window = EventSystem::Window::Create("EventSystem", 1280, 720);
