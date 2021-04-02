@@ -33,6 +33,8 @@ namespace EventSystem {
         [[nodiscard]] virtual inline std::string GetName() const = 0;
         [[nodiscard]] virtual std::string ToString() const = 0;
 
+        friend class EventDispatcher;
+
     protected:
         IEvent()
             : m_Handled(false) {}
@@ -43,5 +45,32 @@ namespace EventSystem {
     }; // class IEvent
 
     using Event = IEvent;
+
+    template <typename T>
+    concept EventSibling = std::is_base_of_v<Event, T>;
+
+    class EventDispatcher {
+    public:
+        template <EventSibling T>
+        using EventFunc = std::function<bool(T&)>;
+
+        explicit EventDispatcher(Event& event)
+            : m_Event(event) {}
+        ~EventDispatcher() = default;
+
+        template <EventSibling T>
+        bool Dispatch(const EventFunc<T>& eventFunc) {
+            if (m_Event.GetEventType() == T::GetStaticEventType()) {
+                m_Event.m_Handled = eventFunc(static_cast<T&>(m_Event));
+                return true;
+            }
+
+            return false;
+        }
+
+    private:
+        Event& m_Event;
+
+    }; // class eventDispatcher
 
 } // namespace EventSystem

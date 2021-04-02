@@ -19,9 +19,12 @@ file(GLOB SOURCE_FILES
 include_directories(src)
 
 add_subdirectory(external/glfw)
+add_subdirectory(external/glm)
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
+target_include_directories(${PROJECT_NAME} PRIVATE external/glm)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE glfw glm)
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE src/pch.hpp)

@@ -16,10 +16,16 @@ namespace EventSystem {
         [[nodiscard]] inline int GetHeight() const { return m_Height; }
         [[nodiscard]] inline bool IsOpen() const { return !glfwWindowShouldClose(m_Handle); }
 
+        void SetEventFunc(const EventFunc& eventFunc);
+        void SetEventFunc(EventFunc&& eventFunc);
+
         void PollEvents() const;
         void SwapBuffers() const;
+        void Close();
 
         friend class Singleton<Window_Impl>;
+        friend class Mouse;
+        friend class Keyboard;
 
     private:
         using HandleType = GLFWwindow;
@@ -38,6 +44,8 @@ namespace EventSystem {
     private:
         Window_Impl(std::string title, int width, int height);
         ~Window_Impl();
+
+        [[nodiscard]] HandleType* GetHandle() const { return m_Handle; }
 
     private:
         std::string m_Title;
