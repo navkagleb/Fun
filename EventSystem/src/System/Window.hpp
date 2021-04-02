@@ -28,6 +28,12 @@ namespace EventSystem {
         static void MouseScrolledCallback(HandleType* handle, double offsetX, double offsetY);
         static void MouseButtonCallback(HandleType* handle, int button, int action, int mods);
         static void KeyCallback(HandleType* handle, int key, int scancode, int action, int mods);
+        static void TypedCallback(HandleType* handle, unsigned int key);
+        static void WindowResizeCallback(HandleType* handle, int width, int height);
+        static void WindowCloseCallback(HandleType* handle);
+        static void WindowMaximizedCallback(HandleType* handle, int maximized);
+        static void WindowMinimizedCallback(HandleType* handle, int minimized);
+        static void WindowFocusCallback(HandleType* handle, int focused);
 
     private:
         Window_Impl(std::string title, int width, int height);

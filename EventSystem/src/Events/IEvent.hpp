@@ -12,8 +12,17 @@ namespace EventSystem {
         MouseScrolledEvent,
         MouseButtonPressedEvent,
         MouseButtonReleasedEvent,
+
         KeyPressedEvent,
-        KeyReleasedEvent
+        KeyReleasedEvent,
+        KeyTypedEvent,
+
+        WindowResizeEvent,
+        WindowCloseEvent,
+        WindowMaximizedEvent,
+        WindowMinimizedEvent,
+        WindowFocusedEvent,
+        WindowUnfocusedEvent
     };
 
     class IEvent {

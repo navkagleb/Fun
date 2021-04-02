@@ -1,27 +1,33 @@
 #pragma once
 
 #include "IEvent.hpp"
+#include "Core/KeyCodes.hpp"
 
 namespace EventSystem {
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    /// KeyEvent ////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////
     class KeyEvent : public IEvent {
     public:
         ~KeyEvent() override = default;
 
-        [[nodiscard]] inline int GetKey() const { return m_Key; }
+        [[nodiscard]] inline int GetKeyCode() const { return m_KeyCode; }
 
     protected:
-        explicit KeyEvent(int key)
-            : m_Key(key) {}
+        explicit KeyEvent(KeyCode keyCode);
 
     protected:
-        int m_Key;
+        KeyCode m_KeyCode;
 
     }; // class KeyCode
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    /// KeyPressedEvent /////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////
     class KeyPressedEvent : public KeyEvent {
     public:
-        KeyPressedEvent(int key, int count);
+        KeyPressedEvent(KeyCode keyCode, int count);
         ~KeyPressedEvent() override = default;
 
         [[nodiscard]] inline int GetCount() const { return m_Count; }
@@ -34,9 +40,12 @@ namespace EventSystem {
 
     }; // class KeyPressedEvent
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    /// KeyReleasedEvent ////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////
     class KeyReleasedEvent : public KeyEvent {
     public:
-        explicit KeyReleasedEvent(int key);
+        explicit KeyReleasedEvent(KeyCode keyCode);
         ~KeyReleasedEvent() override = default;
 
         [[nodiscard]] std::string ToString() const override;
@@ -44,5 +53,19 @@ namespace EventSystem {
         EVENT_CLASS_TYPE(KeyReleasedEvent)
 
     }; // class KeyReleasedEvent
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    /// KeyTypedEvent ///////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    class KeyTypedEvent : public KeyEvent {
+    public:
+        explicit KeyTypedEvent(KeyCode keyCode);
+        ~KeyTypedEvent() override = default;
+
+        [[nodiscard]] std::string ToString() const override;
+
+        EVENT_CLASS_TYPE(KeyTypedEvent);
+
+    }; // class KeyTypedEvent
 
 } // namespace EventSystem
