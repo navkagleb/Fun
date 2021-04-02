@@ -14,6 +14,14 @@ namespace EventSystem {
         m_EventFunc = std::move(eventFunc);
     }
 
+    void Window_Impl::Hide() {
+        glfwHideWindow(m_Handle);
+    }
+
+    void Window_Impl::Show() {
+        glfwShowWindow(m_Handle);
+    }
+
     void Window_Impl::PollEvents() const {
         glfwPollEvents();
     }
@@ -23,7 +31,8 @@ namespace EventSystem {
     }
 
     void Window_Impl::Close() {
-
+        glfwSetWindowShouldClose(m_Handle, GLFW_TRUE);
+        WindowCloseCallback(m_Handle);
     }
 
     void Window_Impl::MouseMovedCallback(HandleType* handle, double x, double y) {
@@ -74,11 +83,11 @@ namespace EventSystem {
         if (!instance.m_EventFunc)
             throw std::runtime_error("EventSystem::Window_Impl::KeyCallback: m_EventFunc is not init!");
 
-        static KeyCode prevKey = -1;
+        static KeyCode prevKey = Key::Unknown;
         static int     count;
 
         if (prevKey != key)
-            count = 0;
+            count = 1;
 
         switch (action) {
             case GLFW_PRESS: {
@@ -88,7 +97,6 @@ namespace EventSystem {
             }
 
             case GLFW_RELEASE: {
-                count = 0;
                 KeyReleasedEvent event(key);
                 instance.m_EventFunc(event);
                 break;
@@ -132,8 +140,6 @@ namespace EventSystem {
     }
 
     void Window_Impl::WindowCloseCallback(HandleType* handle) {
-        std::cout << "CLOSE CALLBACK" << std::endl;
-
         auto& instance = *(Window_Impl*)glfwGetWindowUserPointer(handle);
 
         if (!instance.m_EventFunc)
@@ -182,6 +188,21 @@ namespace EventSystem {
         }
     }
 
+    void Window_Impl::WindowHoverCallback(HandleType *handle, int hovered) {
+        auto& instance = *(Window_Impl*)glfwGetWindowUserPointer(handle);
+
+        if (!instance.m_EventFunc)
+            throw std::runtime_error("EventSystem::Window_Impl::WindowFocusCallback: m_EventFunc is not init!");
+
+        if (hovered == GLFW_TRUE) {
+            WindowCursorEnteredEvent event;
+            instance.m_EventFunc(event);
+        } else {
+            WindowCursorLeftEvent event;
+            instance.m_EventFunc(event);
+        }
+    }
+
     Window_Impl::Window_Impl(std::string title, int width, int height)
         : m_Title(std::move(title))
         , m_Width(width)
@@ -199,16 +220,21 @@ namespace EventSystem {
         glfwMakeContextCurrent(m_Handle);
         glfwSetWindowUserPointer(m_Handle, this);
 
-        glfwSetCursorPosCallback(m_Handle, MouseMovedCallback);
-        glfwSetScrollCallback(m_Handle, MouseScrolledCallback);
-        glfwSetMouseButtonCallback(m_Handle, MouseButtonCallback);
-        glfwSetKeyCallback(m_Handle, KeyCallback);
-        glfwSetCharCallback(m_Handle, TypedCallback);
-        glfwSetWindowSizeCallback(m_Handle, WindowResizeCallback);
-        glfwSetWindowCloseCallback(m_Handle, WindowCloseCallback);
+        // Set glfw callbacks
+        glfwSetCursorPosCallback(     m_Handle, MouseMovedCallback     );
+        glfwSetScrollCallback(        m_Handle, MouseScrolledCallback  );
+        glfwSetMouseButtonCallback(   m_Handle, MouseButtonCallback    );
+        glfwSetKeyCallback(           m_Handle, KeyCallback            );
+        glfwSetCharCallback(          m_Handle, TypedCallback          );
+        glfwSetWindowSizeCallback(    m_Handle, WindowResizeCallback   );
+        glfwSetWindowCloseCallback(   m_Handle, WindowCloseCallback    );
         glfwSetWindowMaximizeCallback(m_Handle, WindowMaximizedCallback);
-        glfwSetWindowIconifyCallback(m_Handle, WindowMinimizedCallback);
-        glfwSetWindowFocusCallback(m_Handle, WindowFocusCallback);
+        glfwSetWindowIconifyCallback( m_Handle, WindowMinimizedCallback);
+        glfwSetWindowFocusCallback(   m_Handle, WindowFocusCallback    );
+        glfwSetCursorEnterCallback(   m_Handle, WindowHoverCallback    );
+        glfwSetWindowContentScaleCallback(m_Handle, [](HandleType* handle, float xscale, float yscale) {
+            std::cout << "fuck this shit" << std::endl;
+        });
     }
 
     Window_Impl::~Window_Impl() {

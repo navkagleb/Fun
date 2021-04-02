@@ -2,12 +2,14 @@
 
 namespace EventSystem {
 
-    using KeyCode = uint16_t;
+    using KeyCode = int16_t;
 
     namespace Key {
 
         // From glfw3 mouse codes
         enum : KeyCode {
+            Unknown             = -1,
+
             Space               = 32,
             Apostrophe          = 39, // '
             Comma               = 44, // ,

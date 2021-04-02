@@ -15,17 +15,20 @@ namespace EventSystem {
         [[nodiscard]] inline int GetWidth() const { return m_Width; }
         [[nodiscard]] inline int GetHeight() const { return m_Height; }
         [[nodiscard]] inline bool IsOpen() const { return !glfwWindowShouldClose(m_Handle); }
+        [[nodiscard]] inline bool IsVisible() const { return glfwGetWindowAttrib(m_Handle, GLFW_VISIBLE); }
 
         void SetEventFunc(const EventFunc& eventFunc);
         void SetEventFunc(EventFunc&& eventFunc);
+
+        void Hide();
+        void Show();
 
         void PollEvents() const;
         void SwapBuffers() const;
         void Close();
 
         friend class Singleton<Window_Impl>;
-        friend class Mouse;
-        friend class Keyboard;
+        friend class Input;
 
     private:
         using HandleType = GLFWwindow;
@@ -40,6 +43,7 @@ namespace EventSystem {
         static void WindowMaximizedCallback(HandleType* handle, int maximized);
         static void WindowMinimizedCallback(HandleType* handle, int minimized);
         static void WindowFocusCallback(HandleType* handle, int focused);
+        static void WindowHoverCallback(HandleType* handle, int hovered);
 
     private:
         Window_Impl(std::string title, int width, int height);

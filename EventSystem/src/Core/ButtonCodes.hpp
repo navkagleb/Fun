@@ -2,28 +2,30 @@
 
 namespace EventSystem {
 
-    using ButtonCode = uint16_t;
+    using ButtonCode = int16_t;
 
     namespace Button {
 
         // From glfw3 key codes
         enum : ButtonCode {
-            Button0                = 0,
-            Button1                = 1,
-            Button2                = 2,
-            Button3                = 3,
-            Button4                = 4,
-            Button5                = 5,
-            Button6                = 6,
-            Button7                = 7,
+            Unknown      = -1,
 
-            ButtonLast             = Button7,
-            ButtonLeft             = Button0,
-            ButtonRight            = Button1,
-            ButtonMiddle           = Button2
+            C0           = 0,
+            C1           = 1,
+            C2           = 2,
+            C3           = 3,
+            C4           = 4,
+            C5           = 5,
+            C6           = 6,
+            C7           = 7,
+
+            ButtonLast   = C7,
+            ButtonLeft   = C0,
+            ButtonRight  = C1,
+            ButtonMiddle = C2
         };
 
-    } // namespace Mouse
+    } // namespace Input
 
 } // namespace EventSystem::Button
 

@@ -5,9 +5,6 @@
 
 namespace EventSystem {
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-    /// MouseMovedEvent /////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////
     class MouseMovedEvent : public IEvent {
     public:
         MouseMovedEvent(int x, int y);
@@ -18,6 +15,7 @@ namespace EventSystem {
         [[nodiscard]] std::string ToString() const override;
 
         EVENT_CLASS_TYPE(MouseMovedEvent)
+        EVENT_CLASS_CATEGORY(EventCategoryInput | EventCategoryMouse)
 
     private:
         int m_X;
@@ -25,9 +23,6 @@ namespace EventSystem {
 
     }; // class MouseMovedEvent
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-    /// MouseScrolledEvent //////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////
     class MouseScrolledEvent : public IEvent {
     public:
         MouseScrolledEvent(int offsetX, int offsetY);
@@ -38,6 +33,7 @@ namespace EventSystem {
         [[nodiscard]] std::string ToString() const override;
 
         EVENT_CLASS_TYPE(MouseScrolledEvent)
+        EVENT_CLASS_CATEGORY(EventCategoryInput | EventCategoryMouse)
 
     private:
         int m_OffsetX;
@@ -45,39 +41,39 @@ namespace EventSystem {
 
     }; // MouseScrolledEvent
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-    /// MouseButtonPressed //////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-    class MouseButtonPressedEvent : public IEvent {
+    class MouseButtonEvent : public IEvent {
+    public:
+        explicit MouseButtonEvent(ButtonCode buttonCode);
+        ~MouseButtonEvent() override = default;
+
+        [[nodiscard]] inline int GetButtonCode() const { return m_ButtonCode; }
+
+        EVENT_CLASS_CATEGORY(EventCategoryInput | EventCategoryMouse | EventCategoryMouseButton)
+
+    protected:
+        int m_ButtonCode;
+
+    }; // class MouseButtonEvent
+
+    class MouseButtonPressedEvent : public MouseButtonEvent {
     public:
         explicit MouseButtonPressedEvent(ButtonCode buttonCode);
         ~MouseButtonPressedEvent() override = default;
 
-        [[nodiscard]] inline int GetButtonCode() const { return m_ButtonCode; }
         [[nodiscard]] std::string ToString() const override;
 
         EVENT_CLASS_TYPE(MouseButtonPressedEvent)
 
-    private:
-        int m_ButtonCode;
-
     }; // MouseButtonPressedEvent
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-    /// MouseButtonReleasedEvent/////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-    class MouseButtonReleasedEvent : public IEvent {
+    class MouseButtonReleasedEvent : public MouseButtonEvent {
     public:
         explicit MouseButtonReleasedEvent(ButtonCode buttonCode);
         ~MouseButtonReleasedEvent() override = default;
 
-        [[nodiscard]] inline int GetButtonCode(int button) const { return m_ButtonCode; }
         [[nodiscard]] std::string ToString() const override;
 
         EVENT_CLASS_TYPE(MouseButtonReleasedEvent);
-
-    private:
-        int m_ButtonCode;
 
     }; // class MouseButtonReleasedEvent
 
