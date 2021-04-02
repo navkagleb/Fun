@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Window.hpp"
+#include "System/Window.hpp"
 
 int main() {
     auto& window = EventSystem::Window::Create("EventSystem", 1280, 720);

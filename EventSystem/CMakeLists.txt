@@ -3,8 +3,18 @@ project(EventSystem)
 
 set(CMAKE_CXX_STANDARD 20)
 
-file(GLOB HEADER_FILES src/*.hpp)
-file(GLOB SOURCE_FILES src/*.cpp)
+file(GLOB HEADER_FILES
+    src/*.hpp
+    src/Core/*.hpp
+    src/Events/*.hpp
+    src/System/*.hpp
+)
+file(GLOB SOURCE_FILES
+    src/*.cpp
+    src/Core/*.cpp
+    src/Events/*.cpp
+    src/System/*.cpp
+)
 
 include_directories(src)
 
