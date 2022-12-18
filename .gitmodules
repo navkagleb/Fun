@@ -1,9 +1,9 @@
 [submodule "MetaBalls/lib/Random"]
-	path = MetaBalls/lib/Random
+	path = meta-balls/lib/Random
 	url = https://github.com/NavkaGleb/Random
 [submodule "EventSystem/external/glfw"]
-	path = EventSystem/external/glfw
+	path = event-system/external/glfw
 	url = https://github.com/glfw/glfw
 [submodule "EventSystem/external/glm"]
-	path = EventSystem/external/glm
+	path = event-system/external/glm
 	url = https://github.com/g-truc/glm
